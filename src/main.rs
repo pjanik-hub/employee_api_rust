@@ -1,14 +1,11 @@
 use diesel::{query_dsl::methods::SelectDsl, RunQueryDsl, SelectableHelper};
 use employee_api_rust::{establish_connection, models::Employee, schema::employees};
-use rocket::{
-    launch,
-    serde::json::{self, Json},
-};
+use rocket::{launch, serde::json::Json};
 
 #[macro_use]
 extern crate rocket;
 
-#[get("/")]
+#[get("/employees")]
 fn get_all_employees() -> Json<Vec<Employee>> {
     let conn = &mut establish_connection();
 
