@@ -1,7 +1,7 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenvy::dotenv;
-use models::{Employee, NewEmployee};
+use models::Employee;
 use rocket::http::Status;
 use std::env;
 use uuid::Uuid;
