@@ -3,6 +3,7 @@ use diesel::prelude::*;
 use dotenvy::dotenv;
 use models::Employee;
 use rocket::http::Status;
+use rocket::serde::json::Json;
 use std::env;
 use uuid::Uuid;
 
@@ -18,14 +19,18 @@ pub fn establish_connection() -> PgConnection {
         .unwrap_or_else(|_| panic!("Could not connect to Postgres db."))
 }
 
-pub fn create_employee_ez(conn: &mut PgConnection, first: &str, last: &str) -> Status {
+pub fn create_employee_ez(
+    conn: &mut PgConnection,
+    new_uuid: Uuid,
+    first: &str,
+    last: &str,
+) -> Status {
     use crate::schema::employees;
 
-    let new_uuid: Uuid = Uuid::new_v4();
-    let new_employee: NewEmployee = NewEmployee {
-        id: &new_uuid,
-        first_name: first,
-        last_name: last,
+    let new_employee: Employee = Employee {
+        id: new_uuid,
+        first_name: first.to_string(),
+        last_name: last.to_string(),
     };
 
     let result = diesel::insert_into(employees::table)
@@ -36,5 +41,22 @@ pub fn create_employee_ez(conn: &mut PgConnection, first: &str, last: &str) -> S
     match result {
         Ok(_) => Status::Ok,
         Err(_) => Status::BadRequest,
+    }
+}
+
+pub fn get_employee_id(
+    conn: &mut PgConnection,
+    employee_id: Uuid,
+) -> Result<Json<Employee>, Status> {
+    use crate::schema::employees;
+    use schema::employees::id;
+
+    let employee = employees::table
+        .filter(id.eq(employee_id))
+        .first::<Employee>(conn);
+
+    match employee {
+        Ok(employee) => Ok(Json(employee)),
+        Err(_) => Err(Status::NotFound),
     }
 }

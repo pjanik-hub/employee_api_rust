@@ -29,6 +29,7 @@ pub enum EmployeeError {
 impl<'r> FromData<'r> for Employee {
     type Error = EmployeeError;
 
+    /// required implementation for parsing the Employee data (via json)
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
         use EmployeeError::*;
 
