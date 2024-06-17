@@ -1,23 +1,21 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use dotenvy::dotenv;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use models::Employee;
 use rocket::http::Status;
 use rocket::serde::json::Json;
-use std::env;
+use rocket_sync_db_pools::database;
 use uuid::Uuid;
 
 pub mod models;
 pub mod schema;
 
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
+//                -- typing this out each time hurts
+pub type PgPool = Pool<ConnectionManager<PgConnection>>;
+pub type PgPooledConn = PooledConnection<ConnectionManager<PgConnection>>;
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
-
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Could not connect to Postgres db."))
-}
+#[database("employee_db")]
+pub struct DbConn(diesel::PgConnection);
 
 pub fn create_employee_ez(
     conn: &mut PgConnection,

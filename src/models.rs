@@ -34,7 +34,7 @@ impl<'r> FromData<'r> for Employee {
         use EmployeeError::*;
 
         // ensure content is the right type
-        let content_type = ContentType::new("application", "json");
+        let content_type = ContentType::JSON;
 
         if req.content_type() != Some(&content_type) {
             return Outcome::Forward((data, Status::UnsupportedMediaType));
